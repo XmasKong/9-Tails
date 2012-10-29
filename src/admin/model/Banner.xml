@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Banner">
+	<!-- Admin Banner by XmasKong -->
+	<insert id="insertBanner" parameterClass="admin.model.BannerBean">
+  	insert into banner 
+  	values (
+  		banner_seq.NEXTVAL, 
+  		#banner_name#, 
+  		#banner_url#, 
+  		0, 
+  		#banner_image_url#,
+  		#banner_start_day#,
+  		#banner_end_day#,
+  		#admin_num#,
+  		#banner_division_num#
+  	)
+  </insert>
+  
+  <insert id="insertBannerLog" parameterClass="admin.model.BannerLogBean">
+  	insert into banner_log
+  	values (
+  		banner_log_seq.NEXTVAL, 
+  		#member_id#, 
+  		SYSDATE, 
+  		#member_ip#, 
+  		#banner_num#
+  	)
+  </insert>
+  
+  <update id="updateBannerCount" parameterClass="int">
+  	update banner set
+      banner_click_count = banner_click_count+1
+    where banner_num = #bid#
+  </update>
+  
+  <select id="selectBannerList" resultClass="admin.model.BannerBean">
+  	select 	b.banner_num,
+			b.banner_name,
+			b.banner_url,
+			b.banner_click_count,
+			b.banner_image_url,
+			to_char(b.banner_start_day, 'yyyy-mm-dd') banner_start_day,
+			to_char(b.banner_end_day, 'yyyy-mm-dd') banner_end_day,
+			b.admin_num,
+			b.banner_division_num,
+			a.admin_id
+	from 	banner	b,
+			admin	a
+	where	b.admin_num = a.admin_num
+  </select>
+  
+  <update id="updateBannerImage" parameterClass="admin.model.BannerBean">
+  	update banner set
+      banner_image_url = #banner_image_url#,
+      admin_num = #admin_num#
+    where banner_num = #banner_num#
+  </update>
+  
+  <update id="updateBannerInfo" parameterClass="admin.model.BannerBean">
+  	update banner set
+      banner_name = #banner_name#,
+      banner_url = #banner_url#,
+      banner_start_day = #banner_start_day#,
+      banner_end_day = #banner_end_day#,
+      admin_num = #admin_num#
+    where banner_num = #banner_num#
+  </update>
+</sqlMap>

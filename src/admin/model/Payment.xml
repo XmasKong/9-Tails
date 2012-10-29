@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Payment">
+   <!-- Admin Delivery by XmasKong -->
+   <select id="selectPaymentList" resultClass="member.model.PaymentBean">
+  	select 	p.payment_num,
+			p.payment_status,
+			p.payment_price,
+			p.payment_ems_number,
+			p.member_num,
+			p.auction_num,
+			m.member_id,
+			m.member_name,
+			a.auction_item_name
+	from 	payment p,
+			member	m,
+			auction	a
+	where	p.payment_status = '승인완료'
+			and p.member_num = m.member_num 
+			and p.auction_num = a.auction_num
+  </select>
+  
+  <select id="selectDeliveryList" resultClass="member.model.PaymentBean">
+  	select 	p.payment_num,
+			p.payment_status,
+			p.payment_price,
+			p.payment_ems_number,
+			p.member_num,
+			p.auction_num,
+			m.member_id,
+			m.member_name,
+			a.auction_item_name
+	from 	payment p,
+			member	m,
+			auction	a
+	where	p.payment_status = '배송완료'
+			and p.member_num = m.member_num 
+			and p.auction_num = a.auction_num
+  </select>
+  
+  <update id="updateEMS" parameterClass="member.model.PaymentBean">
+  		update payment set
+		payment_status = #payment_status#,
+		payment_ems_number = #payment_ems_number#
+   		where payment_num = #payment_num#
+  </update>
+</sqlMap>

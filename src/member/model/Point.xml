@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Point">
+  <typeAlias alias="Point" type="member.model.PointBean"/>
+  <typeAlias alias="ChargeSave" type="member.model.PaymentCashBean"/>
+  <typeAlias alias="PointLog" type="member.model.PointLogBean"/>
+
+
+  <!-- resultMap -->
+  <resultMap id="PointResult" class="Point">
+    <result property="point_num" column="point_num"/>
+    <result property="point_price" column="point_price"/>
+    <result property="point_cash" column="point_cash"/>
+  </resultMap>
+  
+  <resultMap id="ChargeSaveResult" class="ChargeSave">
+  	<result property="payment_cash_num" column="payment_cash_num"/>
+  	<result property="payment_cash_price" column="payment_cash_price"/>
+  	<result property="payment_cash_point" column="payment_cash_point"/>
+  	<result property="payment_cash_status" column="payment_cash_status"/>
+  	<result property="payment_cash_request_day" column="payment_cash_request_day"/>
+  	<result property="payment_cash_approval_day" column="payment_cash_approval_day"/>
+  	<result property="member_num" column="member_num"/>
+  </resultMap>
+  
+  <resultMap id="PointLogResult" class="PointLog">
+    <result property="point_log_num" column="point_log_num"/>
+  	<result property="point_log_day" column="point_log_day"/>
+  	<result property="point_log_content" column="point_log_content"/>
+  	<result property="point_log_chage" column="point_log_chage"/>
+  	<result property="point_log_remain" column="point_log_remain"/>
+  	<result property="member_id" column="member_id"/>
+  	<result property="point_log_division_num" column="point_log_division_num"/>
+  </resultMap>
+
+ 
+  
+  <!-- SQL 구문 -->
+  <select id="selectAllPoints" resultMap="PointResult">
+  	select * from Point
+  </select>
+  
+  <insert id="insertPaymentCash" parameterClass="ChargeSave">
+  	insert into payment_cash (
+  		payment_cash_num,
+  		payment_cash_price,
+  		payment_cash_point,
+  		payment_cash_status,
+  		payment_cash_request_day,
+  		member_num)
+  	values (
+  		payment_cash_seq.nextval, #payment_cash_price#, #payment_cash_point#, #payment_cash_status#, sysdate, #member_num#
+  	)
+  </insert>
+  
+  <insert id="insertPointLog" parameterClass="PointLog">
+  	insert into point_log (
+  		point_log_num,
+  		point_log_day,
+  		point_log_content,
+  		point_log_chage,
+  		point_log_remain,
+  		member_id,
+  		point_log_division_num)
+  	values (
+  		point_log_seq.nextval, sysdate, #point_log_content#, #point_log_chage#, #point_log_remain#, #member_id#, 1
+  	)
+  </insert>
+</sqlMap>
