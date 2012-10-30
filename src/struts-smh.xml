@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC 
+	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+	"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<package name="Auction" extends="struts-default">
+	
+		<action name="ManageItemTest" class="auction.controller.Auction" method="listAuctionItem">
+			<result name="success">/auction/listAuctionItem.jsp</result>
+		</action>
+				
+		<action name="AdminManageItem" class="auction.controller.Auction" method="listAuctionItem">
+			<result name="success">/admin/adminManageItem.jsp</result>
+		</action>
+		
+		<action name="startAuction" class="auction.controller.Auction" method="startAuction">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminManageItem</param>
+			</result>
+		</action>
+		
+		<action name="AuctionDetail" class="auction.controller.Auction" method="viewAuctionDetail">
+			<interceptor-ref name="chain" />
+			<interceptor-ref name="params" />
+			<result>/auction/auctionDetail.jsp</result>
+		</action>
+		
+		<action name="DoBid" class="auction.controller.Auction" method="doBid">
+			<interceptor-ref name="params" />
+			<result name="success" type="chain">
+				<param name="actionName">AuctionDetail</param>
+			</result>
+		</action>
+		
+		<action name="NowBuy" class="etc.controller.Coupon" method="viewCouponList">
+			<interceptor-ref name="params" />
+			<result name="success" type="chain">
+				<param name="actionName">OrderDetail</param>	
+			</result>
+		</action>
+		
+		<action name="OrderDetail" class="auction.controller.Auction" method="viewAuctionDetail">
+			<interceptor-ref name="chain" />
+			<interceptor-ref name="params" />
+			<result>/auction/orderDetail.jsp</result>
+		</action>
+		
+		<action name="Order" class="etc.controller.Coupon" method="viewCouponList">
+			<interceptor-ref name="params" />
+			<result name="success" type="chain">
+				<param name="actionName">OrderDetail2</param>	
+			</result>
+		</action>
+		
+		<action name="OrderDetail2" class="auction.controller.Auction" method="viewAuctionDetail">
+			<interceptor-ref name="chain" />
+			<interceptor-ref name="params" />
+			<result>/member/memberauction2.jsp</result>
+		</action>
+		
+		<action name="OrderBuyNow" class="auction.controller.Auction" method="handlePayment">
+			<result name="success">/main.jsp</result>
+		</action>
+		
+		<action name="OrderBuy" class="auction.controller.Auction" method="handlePayment">
+			<result name="success" type="redirectAction">
+				<param name="actionName">MemberAuction</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="Coupon" extends="struts-default">
+		<action name="GetCoupon" class="etc.controller.Coupon" method="getCoupon">
+			<result name="success" type="redirectAction">
+				<param name="actionName">MemberCache</param>
+			</result>
+		</action>
+		<action name="MemberCache" class="etc.controller.Coupon" method="viewCouponList">
+			<result name="success">/member/membercache.jsp</result>
+		</action>
+	</package>
+	
+	<package name="Admin" extends="struts-default">
+		<action name="AddAd" class="admin.controller.Advertisement" method="addBanner">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminAD</param>
+			</result>
+		</action>
+		
+		<action name="LogBanner" class="admin.controller.Advertisement" method="logBanner">
+			<result name="success">/jsp/HSB/success.jsp</result>
+		</action>
+		
+		<action name="AdminAD" class="admin.controller.Advertisement" method="viewBanner">
+			<result name="success">/admin/adminManageAD.jsp</result>
+		</action>
+		
+		<action name="EditBanner" class="admin.controller.Advertisement">
+			<result name="success">/admin/uploadImage.jsp</result>
+		</action>
+		
+		<action name="EditBannerImage" class="admin.controller.Advertisement" method="editBannerImage">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminAD</param>
+			</result>
+		</action>
+		
+		<action name="UpdateBanner" class="admin.controller.Advertisement" method="editBanner">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminAD</param>
+			</result>
+		</action>
+		
+		<action name="AdminDelivery" class="admin.controller.Delivery" method="viewDelivery">
+			<result name="success">/admin/adminDelivery.jsp</result>
+		</action>
+		
+		<action name="InsertDelivery" class="admin.controller.Delivery">
+			<result name="success">/admin/insertDelivery.jsp</result>
+		</action>
+		
+		<action name="UpdateDelivery" class="admin.controller.Delivery" method="updateDelivery">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminDelivery</param>
+			</result>
+		</action>
+		
+		<action name="UpdateDeliveryList" class="admin.controller.Delivery" method="updateDeliveryList">
+			<result name="success" type="redirectAction">
+				<param name="actionName">AdminDelivery</param>
+			</result>
+		</action>
+	</package>
+</struts>

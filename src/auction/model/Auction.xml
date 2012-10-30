@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Auction">
+	<resultMap class="auction.model.AuctionItemListBean" id="AuctionItemListResult">
+		<result property="item_num" column="item_num" />
+		<result property="item_name" column="item_name" />
+		<result property="item_category_num" column="item_category_num" />
+		<result property="item_nowbuy_price" column="item_nowbuy_price" />
+		<result property="item_count" column="item_count" />
+	</resultMap>
+	
+	<resultMap class="auction.model.AuctionDetailBean" id="AuctionDetailResult">
+		<result property="auction_num" column="auction_num" />
+		<result property="auction_item_name" column="auction_item_name" />
+		<result property="auction_end_day" column="auction_end_day" />
+		<result property="auction_now_price" column="auction_now_price" />
+		<result property="auction_status" column="auction_status" />
+		<result property="auction_member_id" column="auction_member_id" />
+		<result property="item_num" column="item_num" />
+		<result property="item_count" column="item_count" />
+		<result property="item_title_url" column="item_title_url" />
+		<result property="item_detail_url" column="item_detail_url" />
+		<result property="item_image1_url" column="item_image1_url" />
+		<result property="item_image2_url" column="item_image2_url" />
+		<result property="item_image3_url" column="item_image3_url" />
+		<result property="item_limit_price" column="item_limit_price" />
+		<result property="item_nowbuy_price" column="item_nowbuy_price" />
+	</resultMap>
+	
+	<resultMap class="etc.model.FreePointBean" id="FreePointResult">
+		<result property="freepoint_num" column="freepoint_num" />
+		<result property="freepoint_get_day" column="freepoint_get_day" />
+		<result property="freepoint_recharge" column="freepoint_recharge" />
+		<result property="freepoint_use" column="freepoint_use" />
+		<result property="freepoint_end_day" column="freepoint_end_day" />
+		<result property="member_num" column="member_num" />
+	</resultMap>
+	
+	<resultMap class="auction.model.AuctionBean" id="AuctionResult">
+		<result property="auction_num" column="auction_num" />
+		<result property="auction_item_name" column="auction_item_name" />
+		<result property="auction_start_day" column="auction_start_day" />
+		<result property="auction_end_day" column="auction_end_day" />
+		<result property="auction_now_price" column="auction_now_price" />
+		<result property="auction_status" column="auction_status" />
+		<result property="auction_member_id" column="auction_member_id" />
+		<result property="auction_item_id" column="auction_item_id" />
+		<result property="auction_category" column="auction_category" />
+	</resultMap>
+	
+	<select id="selectAuctionItem" resultMap="AuctionItemListResult">
+  	   	select 
+  	   		item_num, item_name, item_category_num, item_nowbuy_price, item_count
+  	   	from item 
+  	   	where item_count > 0
+  	</select>
+  	  	
+  	<insert id="insertAuction" parameterClass="auction.model.AuctionBean">
+  	<selectKey keyProperty="auction_num" resultClass="java.lang.Integer">
+  	   	select 
+  	   		 auction_seq.NEXTVAL
+  	   	from dual
+  	</selectKey>
+  	insert into auction (
+  		auction_num,
+  		auction_item_name,
+  		auction_start_day,
+  		auction_end_day,
+  		auction_now_price,
+  		auction_status,
+  		auction_item_id,
+  		auction_category
+  		)
+  	values (
+  		#auction_num#, #auction_item_name#, to_date(#auction_start_day#, 'yyyy-mm-dd hh24:mi:ss'), to_date(#auction_start_day#, 'yyyy-mm-dd hh24:mi:ss')+2, 0, #auction_status#, #auction_item_id#, 0
+  	)
+  </insert>
+  
+  <select id="selectAuctionDetail" parameterClass="int" resultMap="AuctionDetailResult">
+  	select 	a.auction_num,
+			a.auction_item_name,
+			to_char(auction_end_day, 'yyyy-mm-dd hh24:mi:ss') auction_end_day,
+			a.auction_end_day,
+			a.auction_now_price,
+			a.auction_status,
+			a.auction_member_id,
+			i.item_num,
+			i.item_count,
+			i.item_title_url,
+			i.item_detail_url,
+			i.item_image1_url,
+			i.item_image2_url,
+			i.item_image3_url,
+			i.item_limit_price,
+			i.item_nowbuy_price
+	from 	auction a,
+			item	i
+	where	a.auction_num = #auc_num# 
+			and a.auction_item_id = i.item_num
+  </select>
+  
+  <update id="updateItemMinus" parameterClass="int">
+    update item set
+      item_count = item_count-1
+    where item_num = #item_num#
+  </update>
+  
+  <update id="updateItemPlus" parameterClass="int">
+    update item set
+      item_count = item_count+1
+    where item_num = #item_num#
+  </update>
+  
+  <insert id="insertBid" parameterClass="auction.model.BidBean">
+  	insert into bid (
+  		bid_num,
+  		bid_time,
+  		bid_price,
+  		member_num,
+  		auction_num
+  		)
+  	values (
+  		bid_seq.NEXTVAL, sysdate, #bid_price#, #member_num#, #auction_num#
+  	)
+  </insert>
+ 
+  <update id="updateAuction" parameterClass="auction.model.AuctionDetailBean">
+    update auction set
+      auction_end_day = auction_end_day+10/(24*60*60),
+      auction_now_price = auction_now_price+10,
+      auction_member_id  = #auction_member_id#,
+      auction_status = #auction_status#
+    where auction_num = #auction_num#
+  </update>
+  
+  <update id="updateEndAuction" parameterClass="auction.model.AuctionDetailBean">
+    update auction set
+      auction_end_day=to_date(#auction_end_day#, 'yyyy-mm-dd hh24:mi:ss'),
+      auction_now_price = auction_now_price+10,
+      auction_member_id = #auction_member_id#,
+      auction_status = #auction_status#
+    where auction_num = #auction_num#
+  </update>
+  
+  <insert id="insertPayment" parameterClass="auction.model.AuctionDetailBean">
+  	insert into payment (
+  		payment_num,
+  		payment_status,
+  		payment_price,
+  		member_num,
+  		auction_num
+  		)
+  	values (
+  		payment_seq.NEXTVAL, '주문대기', #auction_now_price#, 
+  		(select member_num from bid where bid_price = (select max(bid_price) from bid where auction_num = #auction_num#) and auction_num = #auction_num#), 
+  		#auction_num#
+  	)
+  </insert>
+  
+  <select id="selectOldFreePoint" resultMap="FreePointResult">
+    select * from (
+    select * from freepoint 
+    where freepoint_recharge>freepoint_use 
+    order by freepoint_end_day
+    ) where rownum = 1
+  </select>
+  
+  <update id="updateFreePoint" parameterClass="etc.model.FreePointBean">
+    update freepoint set
+      freepoint_use = #freepoint_use#
+    where freepoint_num = #freepoint_num#
+  </update>
+  
+  <update id="updateMemberBidPoint" parameterClass="member.model.MemberBean">
+    update member set
+      member_point = #member_point#,
+      member_point_free = #member_point_free#
+    where member_num = #member_num#
+  </update>
+  
+  <insert id="insertPaymentA" parameterClass="member.model.PaymentBean">
+  	<selectKey keyProperty="payment_num" resultClass="java.lang.Integer">
+  	   	select 
+  	   		 payment_seq.NEXTVAL
+  	   	from dual
+  	</selectKey>
+  	insert into payment (
+  		payment_num,
+  		payment_status,
+  		payment_price,
+  		member_num,
+  		auction_num
+  		)
+  	values (
+  		#payment_num#, '승인대기', #payment_price#, #member_num#, #auction_num#
+  	)
+  </insert>
+  
+  <update id="updatePCouponMinus" parameterClass="etc.model.CouponDetailBean">
+    update member_coupon set
+      member_coupon_count = member_coupon_count-1 
+    where member_num = #member_num# and coupon_num = #coupon_num#
+  </update>
+  
+  <insert id="insertCouponLog" parameterClass="admin.model.CouponLogBean">
+  	insert into coupon_log (
+  		coupon_log_num,
+  		coupon_num,
+  		coupon_name,
+  		member_id,
+  		coupon_remain,
+  		payment_num
+  		)
+  	values (
+  		coupon_log_seq.NEXTVAL, #coupon_num#, 
+		(select coupon_name from coupon where coupon_num=#coupon_num#), 
+		#member_id#,
+		(select member_coupon_count 
+			from member_coupon 
+			where coupon_num=#coupon_num# and
+			member_num=(select member_num from member where member_id=#member_id#)),
+		#payment_num#
+  	)
+  </insert>
+  
+  <update id="updateIngAuctionList">
+  	update auction set
+      auction_status = '진행'
+    where SYSDATE > auction_start_day  and auction_status='대기'
+  </update>
+  
+  <select id="selectIngAuctionList" resultMap="AuctionResult">
+  	select 
+  	   	*
+  	from auction 
+  	where auction_status='진행'
+  </select>
+  
+  <update id="updateAuctionCategory" parameterClass="auction.model.AuctionBean">
+  	update auction set
+      auction_category = #auction_category#
+    where auction_num=#auction_num#
+  </update>
+  
+  <update id="updateMemberPayment" parameterClass="member.model.PaymentBean">
+  	update payment set
+  		payment_status = #payment_status#,
+  		payment_price = #payment_price#
+  	where payment_num=#payment_num#
+  </update>
+</sqlMap>

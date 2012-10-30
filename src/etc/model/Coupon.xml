@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+ <sqlMap namespace="Coupon">
+ 	<resultMap class="etc.model.CouponDetailBean" id="CouponDetailResult">
+		<result property="coupon_num" column="coupon_num" />
+		<result property="coupon_name" column="coupon_name" />
+		<result property="coupon_content" column="coupon_content" />
+		<result property="coupon_image_url" column="coupon_image_url" />
+		<result property="coupon_discount" column="coupon_discount" />
+		<result property="member_num" column="member_num" />
+		<result property="member_coupon_count" column="member_coupon_count" />
+		<result property="member_coupon_get_day" column="member_coupon_get_day" />
+		<result property="member_coupon_end_day" column="member_coupon_end_day" />
+	</resultMap>
+	
+	<update id="updateMemberCouponList">
+    update member_coupon set
+      member_coupon_count = 0 
+    where SYSDATE > member_coupon_end_day
+	</update>
+  
+  	<select id="selectMemberCouponList" parameterClass="int" resultMap="CouponDetailResult">
+  	select 	c.coupon_num,
+			c.coupon_name,
+			c.coupon_content,
+			c.coupon_image_url,
+			c.coupon_discount,
+			m.member_num,
+			m.member_coupon_count,
+			m.member_coupon_get_day,
+			m.member_coupon_end_day 
+	from 	coupon			c,
+			member_coupon	m
+	where	m.member_num = #member_num# 
+			and c.coupon_num = m.coupon_num
+			and m.member_coupon_count > 0
+  	</select>
+ 	
+ 	<select id="selectMemberCouponRecently" parameterClass="int" resultMap="CouponDetailResult">
+ 	select 	c.coupon_num,
+			c.coupon_name,
+			c.coupon_content,
+			c.coupon_image_url,
+			c.coupon_discount,
+			m.member_num,
+			m.member_coupon_count,
+			m.member_coupon_get_day,
+			m.member_coupon_end_day 
+	from 	coupon			c,
+			member_coupon	m
+	where	m.member_num = #member_num#
+			and c.coupon_num = m.coupon_num
+			and member_coupon_get_day > SYSDATE - 30
+ 	</select>
+ 	
+	<update id="updateMemberCoupon" parameterClass="member.model.MemberBean">
+	UPDATE /*+bypass_ujvc */  (
+	SELECT 	m.member_coupon_count AS MC,
+			m.member_coupon_get_day AS MG, 
+			m.member_coupon_end_day AS MD 
+	FROM 	member_coupon m,
+			coupon c 
+	WHERE 	m.coupon_num = c.coupon_num
+			and
+			member_num = #member_num#
+			and
+			#member_grade_num# >= c.coupon_grade 
+	)
+	SET	MC = NVL2(MC, MC+1, 1),
+		MG = sysdate,
+		MD = sysdate+30
+	</update>
+ </sqlMap>
