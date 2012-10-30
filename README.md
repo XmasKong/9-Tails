@@ -5,4 +5,4 @@
 created and maintained by SMART IT MASTER+ 23rd team2.
 
 This Project has been reconstituted by <a href="http://kr.linkedin.com/in/xmaskong">XmasKong</a>.<br />
-This provides auction system, management system(banner,delivery)<br />
+This provides auction system and management system(banner,delivery).
